@@ -905,19 +905,27 @@ function App() {
     // Playing: command-center → music → status → calendar (active, near command-center)
     // Paused:  command-center → status → music → calendar (secondary, after status)
     const musicBeforeStatus = isPlaying && mediaInfo.has_media && settingsMusicModeEnabled;
+    // The focus panel is deliberately not in this cycle. It is an interruption that
+    // opens itself when a break is due, not somewhere to browse to.
     const modes: NotchContentMode[] = musicBeforeStatus
-      ? ['command-center', 'music', 'status', 'calendar', 'clipboard', 'focus']
-      : ['command-center', 'status', 'music', 'calendar', 'clipboard', 'focus'];
+      ? ['command-center', 'music', 'status', 'calendar', 'clipboard']
+      : ['command-center', 'status', 'music', 'calendar', 'clipboard'];
     const availableModes = modes.filter(m => {
       if (m === 'music' && (!settingsMusicModeEnabled || !mediaInfo.has_media)) return false;
       if (m === 'calendar' && !productivityEnabled) return false;
       if (m === 'clipboard' && !clip.enabled) return false;
-      if (m === 'focus' && !pet.enabled) return false;
       return true;
     });
 
     const currentIndex = availableModes.indexOf(nectarMode);
-    if (currentIndex === -1) return;
+    if (currentIndex === -1) {
+      // A break nudge can leave the notch sitting on the focus panel, which is not
+      // part of this cycle. Step into the cycle rather than swallowing the swipe.
+      const entry = direction > 0 ? availableModes[0] : availableModes[availableModes.length - 1];
+      manualMusicRef.current = entry === 'music';
+      setNectarMode(entry);
+      return;
+    }
 
     const nextIndex = (currentIndex + direction + availableModes.length) % availableModes.length;
     const nextMode = availableModes[nextIndex];

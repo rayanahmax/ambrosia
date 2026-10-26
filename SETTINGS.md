@@ -51,7 +51,7 @@ The pet is a small nectar drop that lives at the left end of the notch. It dozes
 | `nectar-activity-reset-after` | number string (seconds) | `"240"` | How long a pause has to last before the work run restarts, and before a break counts as taken. Short breaks between tasks don't reset it. Minimum `30`. |
 | `nectar-pet-hue` | hex colour string | `"#f6c453"` | Body colour of the pet, and the accent used by the break nudge. |
 
-The Focus panel is one of the notch's content modes, so you can swipe to it with the rest. While a break is due it opens by itself for a few seconds without needing a hover.
+The Focus panel is not part of the swipe cycle. It opens by itself for a few seconds while a break is due, without needing a hover, and closes again on its own.
 
 ### Clipboard
 

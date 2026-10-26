@@ -83,7 +83,7 @@ A small nectar drop sits at the left end of the notch. It isn't decoration: what
 
 Activity comes from Windows' own record of the last input event, not from which window has focus, so it stays correct when a game or an elevated app has the keyboard. Click the pet and it waves back.
 
-The break nudge opens the Focus panel by itself for a few seconds, then leaves it swipeable like any other notch mode. It shows how long the current unbroken run is and when the next break is due. Stepping away for long enough counts as having taken the break, so a short pause between tasks doesn't reset the timer. It stays quiet while Do Not Disturb is on.
+The break nudge opens the Focus panel by itself for a few seconds, then closes it again. It is not part of the swipe cycle, so it never gets in the way when you are looking for another mode. It shows how long the current unbroken run is and when the next break is due. Stepping away for long enough counts as having taken the break, so a short pause between tasks doesn't reset the timer. It stays quiet while Do Not Disturb is on.
 
 The clipboard panel holds the last few things you copied. Swipe to it, click an entry, and that text is back on your clipboard, ready for you to paste. It records the app that had focus when you copied, which is usually what you need to find an entry again.
 
