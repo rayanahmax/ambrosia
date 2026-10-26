@@ -853,6 +853,8 @@ function App() {
   }, [notchMode, windowLabel]);
 
   const [nectarMode, setNectarMode] = useState<NotchContentMode>('status');
+  /** Name of the command centre icon currently under the cursor. */
+  const [ccHint, setCcHint] = useState("");
   const caldav = useCaldav();
 
   // The notch pet, and the two panels it drives. Each hook owns its own settings keys
@@ -1540,7 +1542,7 @@ function App() {
     if (nectarMode === 'clipboard') return isHovered ? 152 : 36;
     if (nectarMode === 'focus') return isHovered || wellnessPeek ? 96 : 36;
     if (nectarMode === 'calendar') return settingsCalendarEnabled ? (caldav.connected ? 350 : 310) : 262;
-    if (nectarMode === 'command-center') return isHovered ? 230 : 36;
+    if (nectarMode === 'command-center') return isHovered ? 244 : 36;
     if (nectarMode === 'status') return 36;
     if (isMusicMode && isHovered) {
       const hasProgressBar = (mediaInfo.duration_ms ?? 0) > 0;
@@ -2193,46 +2195,70 @@ function App() {
                     <div className="cc-circular-actions-row">
                       <button
                         className={`cc-circular-btn ${dndActive ? 'active' : ''}`}
-                        data-tooltip={dndActive ? "Do Not Disturb: On" : "Do Not Disturb: Off"}
+                        onMouseEnter={() => setCcHint(dndActive ? "Do Not Disturb: On" : "Do Not Disturb: Off")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); setDndActive(prev => !prev); }}
                       >
                         <MoonIcon />
                       </button>
                       <button
                         className={`cc-circular-btn ${batterySaverEnabled ? 'active' : ''}`}
-                        data-tooltip="Battery Saver"
+                        onMouseEnter={() => setCcHint("Battery Saver")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); openBatterySaverSettings(); }}
                       >
                         <BatterySaverIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
-                        data-tooltip="System Tray"
+                        onMouseEnter={() => setCcHint("System Tray")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); invoke("open_tray_window"); }}
                       >
                         <TrayIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
-                        data-tooltip="Notifications"
+                        onMouseEnter={() => setCcHint("Notifications")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); invoke("open_notification_center"); }}
                       >
                         <BellIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
-                        data-tooltip="Settings"
+                        onMouseEnter={() => setCcHint("Settings")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); openSettingsWindow(); }}
                       >
                         <SettingsIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
-                        data-tooltip="Restart"
+                        onMouseEnter={() => setCcHint("Restart Nectar")}
+                        onMouseLeave={() => setCcHint("")}
                         onClick={(e) => { e.stopPropagation(); invoke("restart_nectar"); }}
                       >
                         <ReloadIcon />
                       </button>
+                    </div>
+
+                    {/* One quiet line naming whatever you are pointing at. It is always
+                        there, so the panel never jumps as the text comes and goes. */}
+                    <div className="cc-hint-line">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {ccHint && (
+                          <motion.span
+                            key={ccHint}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.12 }}
+                          >
+                            {ccHint}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     {/* Classic Sliders Area */}
