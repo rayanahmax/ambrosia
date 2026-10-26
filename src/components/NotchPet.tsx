@@ -67,12 +67,14 @@ export default function NotchPet({ state, size = 30, hue = "#f6c453", onPoke }: 
   const breath = BREATH[state];
   const eyeScaleY = eyesClosed || blinking ? 0.08 : eyesDroopy ? 0.45 : 1;
 
-  // Three dream letters, each with its own delay, drifting up and out to the right.
+  // Three dream letters, each with its own delay. They start past the right edge of
+  // the body and drift further right, so they always travel over the dark notch
+  // rather than over the pet, which would make them vanish on a light body colour.
   const zzz = useMemo(
     () => [
-      { key: "z0", delay: 0, x: 9, y: 2, size: 7 },
-      { key: "z1", delay: 0.9, x: 13, y: 0, size: 8.5 },
-      { key: "z2", delay: 1.8, x: 17, y: -2, size: 10 },
+      { key: "z0", delay: 0, x: 27, y: 12, size: 7 },
+      { key: "z1", delay: 0.9, x: 31, y: 9, size: 8.5 },
+      { key: "z2", delay: 1.8, x: 35, y: 6, size: 10 },
     ],
     []
   );
@@ -204,11 +206,11 @@ export default function NotchPet({ state, size = 30, hue = "#f6c453", onPoke }: 
             <motion.span
               key={z.key}
               className="notch-pet-z"
-              initial={{ opacity: 0, x: z.x, y: z.y + 8, scale: 0.5 }}
+              initial={{ opacity: 0, x: z.x, y: z.y + 6, scale: 0.5 }}
               animate={{
-                opacity: [0, 0.85, 0],
-                x: [z.x, z.x + 5, z.x + 9],
-                y: [z.y + 8, z.y + 2, z.y - 3],
+                opacity: [0, 0.95, 0],
+                x: [z.x, z.x + 4, z.x + 7],
+                y: [z.y + 6, z.y + 1, z.y - 4],
                 scale: [0.5, 1, 1.15],
               }}
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
@@ -224,7 +226,7 @@ export default function NotchPet({ state, size = 30, hue = "#f6c453", onPoke }: 
                 top: 0,
                 fontSize: (z.size * size) / W,
                 fontWeight: 700,
-                color: hue,
+                color: "#c9d2ff",
                 lineHeight: 1,
                 pointerEvents: "none",
                 fontStyle: i === 2 ? "italic" : "normal",

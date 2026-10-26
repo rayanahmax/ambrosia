@@ -160,12 +160,14 @@ export function usePet({ muted = false }: UsePetOptions = {}) {
   }, []);
 
   // Ramp sleepy -> dozing -> asleep between backend reports.
+  const [idleMs, setIdleMs] = useState(0);
   useEffect(() => {
     const tick = () => {
       const { enabled, sleepAfterSec } = settingsRef.current;
       if (!enabled) return;
       const idle = Date.now() - lastInputAt.current;
       const sleepMs = sleepAfterSec * 1000;
+      setIdleMs(idle);
 
       setPetState((prev) => {
         if (prev === "waving") return prev; // let the wave finish
@@ -228,6 +230,7 @@ export function usePet({ muted = false }: UsePetOptions = {}) {
 
   return {
     state: petState,
+    idleMs,
     enabled: settings.enabled,
     hue: settings.hue,
     focusMs,
