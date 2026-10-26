@@ -2193,36 +2193,42 @@ function App() {
                     <div className="cc-circular-actions-row">
                       <button
                         className={`cc-circular-btn ${dndActive ? 'active' : ''}`}
+                        data-tooltip={dndActive ? "Do Not Disturb: On" : "Do Not Disturb: Off"}
                         onClick={(e) => { e.stopPropagation(); setDndActive(prev => !prev); }}
                       >
                         <MoonIcon />
                       </button>
                       <button
                         className={`cc-circular-btn ${batterySaverEnabled ? 'active' : ''}`}
+                        data-tooltip="Battery Saver"
                         onClick={(e) => { e.stopPropagation(); openBatterySaverSettings(); }}
                       >
                         <BatterySaverIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
+                        data-tooltip="System Tray"
                         onClick={(e) => { e.stopPropagation(); invoke("open_tray_window"); }}
                       >
                         <TrayIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
+                        data-tooltip="Notifications"
                         onClick={(e) => { e.stopPropagation(); invoke("open_notification_center"); }}
                       >
                         <BellIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
+                        data-tooltip="Settings"
                         onClick={(e) => { e.stopPropagation(); openSettingsWindow(); }}
                       >
                         <SettingsIcon />
                       </button>
                       <button
                         className="cc-circular-btn"
+                        data-tooltip="Restart"
                         onClick={(e) => { e.stopPropagation(); invoke("restart_nectar"); }}
                       >
                         <ReloadIcon />

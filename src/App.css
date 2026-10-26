@@ -1645,6 +1645,27 @@ img {
     padding: 0 4px;
 }
 
+/* The panel clips to its rounded corners, so a centred tooltip on the buttons at
+   either end of the row would be cut off. Grow those two inward instead. */
+.cc-circular-actions-row > button:first-child[data-tooltip]::after {
+    left: 0;
+    transform: translateX(0) scale(0.95);
+}
+
+.cc-circular-actions-row > button:first-child[data-tooltip]:hover::after {
+    transform: translateX(0) scale(1);
+}
+
+.cc-circular-actions-row > button:last-child[data-tooltip]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) scale(0.95);
+}
+
+.cc-circular-actions-row > button:last-child[data-tooltip]:hover::after {
+    transform: translateX(0) scale(1);
+}
+
 .cc-circular-btn {
     width: 32px;
     height: 32px;
