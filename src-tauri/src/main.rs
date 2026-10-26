@@ -16,6 +16,8 @@ mod caldav;
 mod calendar_sync;
 mod ics;
 mod active_look;
+mod activity;
+mod clipboard;
 
 use tauri::Manager;
 use windows::Win32::System::Console::SetConsoleCtrlHandler;
@@ -188,7 +190,12 @@ fn main() {
             calendar_sync::caldav_get_cache,
             ics::ics_add_link,
             ics::ics_remove_link,
-            ics::ics_detect
+            ics::ics_detect,
+            activity::get_user_state,
+            clipboard::get_clipboard_history,
+            clipboard::clipboard_restore,
+            clipboard::clipboard_delete,
+            clipboard::clipboard_clear
         ])
         .setup(|app| {
             init_taskbar_marker(app.handle());
@@ -276,6 +283,8 @@ fn main() {
             start_window_style_guard(app.handle().clone());
             setup_audio_visualization(app.handle().clone());
             setup_settings_watcher(app.handle().clone());
+            activity::setup_activity_watchdog(app.handle().clone());
+            clipboard::setup_clipboard_watchdog(app.handle().clone());
 
             // Listen for second-instance signal to open settings
             if let Some(&h_event) = SINGLE_INSTANCE_EVENT_HANDLE.get() {

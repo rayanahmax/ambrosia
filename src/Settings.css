@@ -1303,3 +1303,23 @@ input:checked + .slider:before {
 .caldav-providers {
   align-self: flex-start;
 }
+
+/* Colour picker used by the Pet tab, sized to sit where a dropdown sits. */
+.pet-colour-input {
+    width: 34px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.pet-colour-input::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.pet-colour-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}

@@ -39,6 +39,33 @@ Edit `settings.json` with any text editor while Nectar is running. Changes are a
 | `nectar-notch-edge-delay` | number string (ms) | `"200"` | Smart and peek notch only. How long the cursor has to rest on the top edge before the notch peeks, so sweeping across a maximized window's tabs doesn't trigger it. `0` peeks instantly. Maximum `2000`. |
 | `nectar-notch-mode` | `"fixed"` / `"smart"` / `"peek"` | `"fixed"` | Notch (top bar) visibility behavior. **fixed** = always visible, never auto-hides (including over fullscreen apps — matches a real hardware notch, which doesn't disappear either). **smart** = hides when overlapped by another window/fullscreen app, reveals on hover. **peek** = hidden until cursor approaches the top edge, a media event, or a notification. Smart/peek reveal and are fully clickable on hover even over a fullscreen app (only a thin strip right at the screen edge stays click-through, so it never steals input meant for another app). Unlike the Dock, the notch never reserves desktop work-area space, so it never leaves a gap above maximized windows' content. |
 
+### Pet and Break Nudges
+
+The pet is a small nectar drop that lives at the left end of the notch. It dozes and shows dream letters while the machine is quiet, and wakes up waving when you come back. It is driven by real input activity (`GetLastInputInfo`), not by whether a window has focus.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `nectar-pet-enabled` | `"true"` / `"false"` | `"true"` | Shows the pet in the notch. Off, the notch keeps its original width and shows no pet. |
+| `nectar-pet-sleep-after` | number string (seconds) | `"90"` | How long with no keyboard or mouse input before the pet is fully asleep. It starts looking sleepy at a little over half that. Minimum `5`. |
+| `nectar-pet-break-after-min` | number string (minutes) | `"45"` | Minutes of unbroken work before the pet waves and the notch opens the Focus panel. `0` switches the nudge off but keeps the pet. |
+| `nectar-activity-reset-after` | number string (seconds) | `"240"` | How long a pause has to last before the work run restarts, and before a break counts as taken. Short breaks between tasks don't reset it. Minimum `30`. |
+| `nectar-pet-hue` | hex colour string | `"#f6c453"` | Body colour of the pet, and the accent used by the break nudge. |
+
+The Focus panel is one of the notch's content modes, so you can swipe to it with the rest. While a break is due it opens by itself for a few seconds without needing a hover.
+
+### Clipboard
+
+History of the last few things you copied, readable by swiping to the clipboard panel in the notch. Click an entry to put it back on the clipboard; it does not paste for you, so nothing can land somewhere you didn't intend.
+
+Off by default, because a clipboard log is a record of everything you copied. Entries live in memory only and are gone when Nectar quits.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `nectar-clipboard-enabled` | `"true"` / `"false"` | `"false"` | Captures copied text. Turning it off also drops what was already captured. |
+| `nectar-clipboard-history-size` | number string | `"15"` | How many entries to keep, between `1` and `100`. Oldest are dropped first. |
+
+Only text is captured. Copies under two characters and over 20,000 are skipped, and re-copying the same thing moves the existing entry to the top instead of duplicating it. Each entry records the process that had focus when the copy happened, shown as the "copied from" label.
+
 ### Monitors
 
 The dock and the notch each choose their monitors separately. In Settings this is the **Show On** dropdown on the Dock and Notch tabs.

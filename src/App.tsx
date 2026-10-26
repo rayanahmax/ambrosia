@@ -14,6 +14,11 @@ import { useTrailingThrottle } from "./hooks/useTrailingThrottle";
 import { useCaldav } from "./hooks/useCaldav";
 import { NotchCalendar } from "./components/NotchCalendar";
 import { NotchClock, StopwatchReadout } from "./components/NotchClock";
+import NotchPet from "./components/NotchPet";
+import NotchFocus from "./components/NotchFocus";
+import NotchClipboard from "./components/NotchClipboard";
+import { usePet } from "./hooks/usePet";
+import { useClipboard } from "./hooks/useClipboard";
 import { useStopwatch } from "./hooks/useStopwatch";
 import type { WidgetConfig } from "./components/StatusWidgetConfig";
 import {
@@ -298,6 +303,12 @@ const TitleMarquee = ({ title }: { title: string }) => {
 
 
 
+
+/** What the notch is showing, as opposed to how visibly it is showing it. */
+type NotchContentMode = 'music' | 'calendar' | 'command-center' | 'status' | 'focus' | 'clipboard';
+
+/** Room held at the left of the pill for the pet, in notch units. */
+const PET_GUTTER = 34;
 
 function App() {
   useEffect(() => {
@@ -841,8 +852,27 @@ function App() {
     invoke("change_notch_mode", { mode: notchMode });
   }, [notchMode, windowLabel]);
 
-  const [nectarMode, setNectarMode] = useState<'music' | 'calendar' | 'command-center' | 'status'>('status');
+  const [nectarMode, setNectarMode] = useState<NotchContentMode>('status');
   const caldav = useCaldav();
+
+  // The notch pet, and the two panels it drives. Each hook owns its own settings keys
+  // and stays silent until those keys are switched on.
+  const pet = usePet({ muted: dndActive });
+  const clip = useClipboard();
+
+  // A break nudge holds the focus panel open for a few seconds without a hover,
+  // otherwise it would only be visible to someone already looking at the notch.
+  const [wellnessPeek, setWellnessPeek] = useState(false);
+  useEffect(() => {
+    if (!pet.breakDue) {
+      setWellnessPeek(false);
+      return;
+    }
+    setWellnessPeek(true);
+    setNectarMode('focus');
+    const timer = setTimeout(() => setWellnessPeek(false), 9000);
+    return () => clearTimeout(timer);
+  }, [pet.breakDue]);
 
   // Window height is now kept constant to prevent rendering layout lag and sharp corners
 
@@ -875,12 +905,14 @@ function App() {
     // Playing: command-center → music → status → calendar (active, near command-center)
     // Paused:  command-center → status → music → calendar (secondary, after status)
     const musicBeforeStatus = isPlaying && mediaInfo.has_media && settingsMusicModeEnabled;
-    const modes: ('command-center' | 'status' | 'music' | 'calendar')[] = musicBeforeStatus
-      ? ['command-center', 'music', 'status', 'calendar']
-      : ['command-center', 'status', 'music', 'calendar'];
+    const modes: NotchContentMode[] = musicBeforeStatus
+      ? ['command-center', 'music', 'status', 'calendar', 'clipboard', 'focus']
+      : ['command-center', 'status', 'music', 'calendar', 'clipboard', 'focus'];
     const availableModes = modes.filter(m => {
       if (m === 'music' && (!settingsMusicModeEnabled || !mediaInfo.has_media)) return false;
       if (m === 'calendar' && !productivityEnabled) return false;
+      if (m === 'clipboard' && !clip.enabled) return false;
+      if (m === 'focus' && !pet.enabled) return false;
       return true;
     });
 
@@ -1463,7 +1495,7 @@ function App() {
   const isMusicMode = mediaInfo.has_media && nectarMode === 'music' && settingsMusicModeEnabled;
 
   // Calculate width dynamically based on enabled features
-  const getDynamicWidth = () => {
+  const notchBaseWidth = () => {
     if (isCalendarMode) return settingsCalendarEnabled && showClockColumn ? 480 : settingsCalendarEnabled ? 310 : 270;
     if (nectarMode === 'command-center' && isHovered) {
       const totalWidgets = statusWidgets.left.length + statusWidgets.right.length;
@@ -1490,10 +1522,15 @@ function App() {
     return w;
   };
 
+  // The pet holds a gutter open at the left of the pill, so every mode is that much wider.
+  const getDynamicWidth = () => notchBaseWidth() + (pet.enabled && isNotchWindow ? PET_GUTTER : 0);
+
   const getDynamicHeight = () => {
     if (!isExpanded || isHidden) {
       return isImpacted ? 28.9 : 44.2;
     }
+    if (nectarMode === 'clipboard') return isHovered ? 152 : 36;
+    if (nectarMode === 'focus') return isHovered || wellnessPeek ? 96 : 36;
     if (nectarMode === 'calendar') return settingsCalendarEnabled ? (caldav.connected ? 350 : 310) : 262;
     if (nectarMode === 'command-center') return isHovered ? 230 : 36;
     if (nectarMode === 'status') return 36;
@@ -1545,7 +1582,7 @@ function App() {
       <div style={{ zoom: scale, width: '100%', display: 'flex', justifyContent: 'center' }}>
         <motion.div
           ref={nectarRef}
-          className={`nectar ${isHovered ? 'expanded' : ''} ${isImpacted ? 'is-impacted' : ''}`}
+          className={`nectar ${isHovered ? 'expanded' : ''} ${isImpacted ? 'is-impacted' : ''} ${pet.enabled && isNotchWindow ? 'has-pet' : ''}`}
           onMouseEnter={() => setIsNotchHovered(true)}
         onMouseLeave={() => setIsNotchHovered(false)}
         onWheel={handleWheel}
@@ -1576,7 +1613,7 @@ function App() {
           const targetMode = mediaInfo.has_media && isPlaying && settingsMusicCompactNotch ? 'music' : 'status';
           if (nectarMode === 'music') {
             setNectarMode(targetMode);
-          } else if (nectarMode === 'command-center' || nectarMode === 'calendar' || nectarMode === 'status') {
+          } else if (nectarMode === 'command-center' || nectarMode === 'calendar' || nectarMode === 'status' || nectarMode === 'clipboard' || (nectarMode === 'focus' && !wellnessPeek)) {
             setNectarMode(targetMode);
           }
         }}
@@ -1593,6 +1630,13 @@ function App() {
           default: { type: "spring", stiffness: 500, damping: 30, mass: 1 }
         }}
       >
+
+        {/* The pet clings to the left gutter of the pill. */}
+        {pet.enabled && isNotchWindow && (
+          <div className="notch-pet-anchor">
+            <NotchPet state={pet.state} size={26} hue={pet.hue} onPoke={pet.poke} />
+          </div>
+        )}
 
         <AnimatePresence>
           {isMusicMode && settingsAmbienceEnabled && albumArtUrl && isHovered && !isCalendarMode && (
@@ -2016,6 +2060,51 @@ function App() {
                         )}
                       </AnimatePresence>
                     </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Focus / break panel */}
+              <AnimatePresence>
+                {nectarMode === 'focus' && (isHovered || wellnessPeek) && (
+                  <motion.div
+                    key="focus-panel"
+                    className="notch-panel"
+                    onClick={e => e.stopPropagation()}
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6, transition: { duration: 0.1 } }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    <NotchFocus
+                      focusMs={pet.focusMs}
+                      breakDue={pet.breakDue}
+                      breakAfterMin={pet.settings.breakAfterMin}
+                      hue={pet.hue}
+                      onDone={pet.dismissBreak}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Clipboard history panel */}
+              <AnimatePresence>
+                {nectarMode === 'clipboard' && isHovered && (
+                  <motion.div
+                    key="clipboard-panel"
+                    className="notch-panel"
+                    onClick={e => e.stopPropagation()}
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6, transition: { duration: 0.1 } }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    <NotchClipboard
+                      items={clip.items}
+                      onRestore={(i) => { clip.restore(i).catch(() => {}); }}
+                      onRemove={(i) => { clip.remove(i).catch(() => {}); }}
+                      onClear={() => { clip.clear().catch(() => {}); }}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

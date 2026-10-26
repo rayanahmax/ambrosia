@@ -33,6 +33,8 @@ Nectar is a fork of [Bloom](https://github.com/SehajveerSingh2005/bloom) by Seha
 ## Features
 
 - **A notch that does things.** Music, quick controls, system stats, and a calendar in one spring-animated island at the top of your screen.
+- **A pet that keeps watch.** A small nectar drop lives on the notch. It dozes while the machine is quiet and wakes up waving when you come back, so the notch reads as a status light for whether you're at the keyboard. After a long unbroken run it nudges you to stand up.
+- **Clipboard history.** Swipe to the clipboard panel to reuse something you copied earlier. Off by default, in memory only, and it never pastes anything anywhere by itself.
 - **A dock that replaces your taskbar.** It mirrors your real taskbar (same pinned apps, same order, real icons and names) and hides the native one.
 - **Native where it counts.** The system tray opens the actual Windows flyout, and Quit ends an app the way Task Manager's End task does.
 - **Yours to shape.** Themes, three visibility modes, per-monitor placement, and every option in a plain `settings.json` you can edit live.
@@ -66,6 +68,26 @@ Width, height, corner radius, and position each animate on their own spring, so 
 | **Peek** | Hidden until the cursor reaches the top edge, or a media event or notification arrives. |
 
 In Smart and Peek the notch stays fully clickable when it's revealed. Only a thin strip at the very edge of the screen stays click-through, so it never swallows input meant for a screenshot tool or a game. The notch never reserves desktop space, so it can't leave a gap above maximized windows.
+
+## The Pet and the Clipboard
+
+A small nectar drop sits at the left end of the notch. It isn't decoration: what it's doing is a reading of what you're doing.
+
+| It looks like | What it means |
+| --- | --- |
+| Eyes open, settling | You're at the keyboard. |
+| Droopy, one or two dream letters | The machine has been quiet for a while. |
+| Asleep, letters rising | No keyboard or mouse input for as long as **Settings › Pet › Fall asleep after** says. |
+| Waving | You just came back to it. |
+| Both arms up, panel open | You've been going without a break for longer than **Break nudge after** allows. |
+
+Activity comes from Windows' own record of the last input event, not from which window has focus, so it stays correct when a game or an elevated app has the keyboard. Click the pet and it waves back.
+
+The break nudge opens the Focus panel by itself for a few seconds, then leaves it swipeable like any other notch mode. It shows how long the current unbroken run is and when the next break is due. Stepping away for long enough counts as having taken the break, so a short pause between tasks doesn't reset the timer. It stays quiet while Do Not Disturb is on.
+
+The clipboard panel holds the last few things you copied. Swipe to it, click an entry, and that text is back on your clipboard, ready for you to paste. It records the app that had focus when you copied, which is usually what you need to find an entry again.
+
+It is off by default and nothing is written to disk. Turning it off clears what was captured. Only text is stored, and re-copying the same thing moves the existing entry to the top rather than duplicating it.
 
 ## The Dock
 

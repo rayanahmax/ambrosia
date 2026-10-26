@@ -4,7 +4,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Effect, EffectState } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { Settings, Palette, PanelTop, Monitor, Layers, Info } from "lucide-react";
+import { Settings, Palette, PanelTop, Monitor, Layers, Info, PawPrint } from "lucide-react";
 import { WindowControls } from "./components/WindowControls";
 import {
   useSettings,
@@ -14,6 +14,7 @@ import {
   CalendarSyncPage,
   DockTab,
   OverlaysTab,
+  PetTab,
   AboutTab,
 } from "./settings/index";
 import type { SettingsTab } from "./settings/index";
@@ -28,6 +29,7 @@ const TABS: { id: SettingsTab; label: string; icon: typeof Settings }[] = [
   { id: "notch", label: "Notch", icon: PanelTop },
   { id: "dock", label: "Dock", icon: Monitor },
   { id: "overlays", label: "Overlays", icon: Layers },
+  { id: "pet", label: "Pet", icon: PawPrint },
   { id: "about", label: "About", icon: Info },
 ];
 
@@ -216,6 +218,7 @@ function SettingsApp() {
               toggleBrightnessEdge={settings.toggleBrightnessEdge}
             />
           )}
+          {activeTab === "pet" && <PetTab />}
           {activeTab === "about" && (
             <AboutTab
               appVersion={settings.appVersion}

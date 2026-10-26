@@ -8,7 +8,7 @@ import { useSettingsSync } from "../hooks/useSettingsSync";
 import { hexToHsl } from "../theme";
 import type { WidgetConfig, MonitorInfo, MonitorMode } from "./types";
 
-function saveSetting(key: string, value: string) {
+export function saveSetting(key: string, value: string) {
   localStorage.setItem(key, value);
   invoke("save_setting", { key, value }).catch(console.error);
 }

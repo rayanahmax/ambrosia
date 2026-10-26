@@ -6,6 +6,7 @@ export { NotchTab } from "./NotchTab";
 export { CalendarSyncPage } from "./CalendarSyncPage";
 export { DockTab } from "./DockTab";
 export { OverlaysTab } from "./OverlaysTab";
+export { PetTab } from "./PetTab";
 export { ProcessesTab } from "./ProcessesTab";
 export { AboutTab } from "./AboutTab";
 export type { WidgetConfig, SettingsTab, SettingRowProps } from "./types";

@@ -2266,3 +2266,61 @@ img {
     text-align: center;
     opacity: 0.35;
 }
+
+/* ---------- Notch pet, focus panel and clipboard panel ---------- */
+
+/* The pet lives in a gutter at the left of the pill, so the rest of the content
+   starts after it instead of underneath it. */
+.nectar.has-pet {
+    padding-left: 36px;
+}
+
+.notch-pet-anchor {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    z-index: 6;
+    display: flex;
+    align-items: flex-start;
+}
+
+.notch-pet-z {
+    font-family: inherit;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    user-select: none;
+}
+
+/* Panels that fill the pill when a mode is showing expanded content. */
+.notch-panel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 6px 10px 8px;
+    color: var(--nectar-text, white);
+}
+
+.clip-row:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.clip-row:hover .clip-remove {
+    opacity: 0.6;
+}
+
+.clip-remove:hover {
+    opacity: 1 !important;
+}
+
+/* Keep the thin scrollbar out of the way but usable on the clipboard list. */
+.notch-panel::-webkit-scrollbar,
+.notch-panel *::-webkit-scrollbar {
+    width: 3px;
+}
+
+.notch-panel *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 3px;
+}
